@@ -3,7 +3,6 @@ import math
 
 class Table():
 
-
     class Players():
         def __init__(self, player):
             self.name = "player{0}".format(player)
@@ -13,74 +12,81 @@ class Table():
             self.name = "piece{0}".format(name)
             self.owner = owner
             self.charge = charge
-
-    class Board():
-        def __init__(self, table, size = 7):
-            self.table = table
-            self.size = size
-            #Create the board
-            #First column number of top row
-            self.start_col = math.floor(self.size/2)
-            #Number of columns in first row
-            self.cols = math.ceil(self.size/2)
-            #Row number of middle row
-            self.midway = math.ceil(self.size/2) - 1
-            #Empty array to hold board
-            
-            #Create each row
-            for r in range(self.size):
-                #Create each column (q) in the row, appending each to the board
-                for q in range(self.start_col, self.start_col + self.cols):
-                    self.table.spaces.append(self.table.Spaces(q,r))
-                #Decrement starting column number (min 0)
-                if self.start_col > 0:
-                    self.start_col -= 1
-                #Decrement or increment row number based on whether above or bellow midway
-                if r < self.midway:
-                    self.cols += 1
-                else:
-                    self.cols -= 1
         
     class Spaces():
-        def __init__(self, col, row):
-            self.col = col
-            self.row = row
+        def __init__(self, q, r):
+            self.q = q
+            self.r = r
             self.piece = None
-            self.name = "{0},{1}".format(col,row)
 
 
     def __init__(self, board_size = 7):
         self.players = []
         self.board_size = board_size
-        self.spaces = []
-        self.pieces = []
+        self.board = []
         
         #Create the players, store them in an array so they don't need to be assigned to variables
         for n in range(2):
             self.players.append(self.Players(n))
         
-        #Create the board
-        self.board = self.Board(self, board_size)
+        #Map the board
+        #First column number of top row
+        start_col = math.floor(self.board_size/2)
+        #Number of columns in first row
+        cols = math.ceil(self.board_size/2)
+        #Row number of middle row
+        midway = math.ceil(self.board_size/2) - 1
+        #Empty array to hold board
+        
+        #Create each row
+        for r in range(self.board_size):
+            #Create each column (q) in the row, appending each to the board
+            for q in range(start_col, start_col + cols):
+                #Board contains written address, object, and piece if needed
+                self.board.append(["{0},{1}".format(q,r),self.Spaces(q,r),None])
+            #Decrement starting column number (min 0)
+            if start_col > 0:
+                start_col -= 1
+            #Decrement or increment row number based on whether above or bellow midway
+            if r < midway:
+                cols += 1
+            else:
+                cols -= 1
 
-        #Create pieces, store them in an array so they don't need to be assigned to variables
-        self.piece_count = self.board_size - 2
-        for player in self.players:
-            for n in range(self.piece_count):
-                self.pieces.append(self.Pieces(n,player))
+        #Populate the board with pieces
+        #Find last row
+        bottom_row = 0
+        for e in self.board:
+            row = e[1].r
+            if row > bottom_row:
+                bottom_row = row
+        #Loop over the players so we can assign their objects as owners
+        for p in self.players:
+            piece = 0
+            first_row = 0
+            second_row = 1
+            if p.name == "player1":
+                first_row = bottom_row
+                second_row = bottom_row - 1
+            #Loop over the board array
+            for e in self.board:
+                #Add pieces to the board in every space of the first row, and every odd space of the second row
+                if e[1].r == first_row or (e[1].r == second_row and e[1].q % 2 != 0):
+                    e[2] = self.Pieces(piece,p)
+                    piece += 1
+
+    def view_board(self):
+        #Prints a list of all spaces on the board, and pieces on those spaces where they exist
+        for e in self.board:
+            if e[2] is None:
+                print("{0} | empty".format(e[0]))
+            else:
+                print("{0} | {1} (Charge: {2}, Owner: {3})".format(e[0],e[2].name,str(e[2].charge),e[2].owner.name))
 
 
-        #Put player pieces on the board
-        #Find width of top row
-        #Load pieces into each space
-        #Find next row
-        #Load pieces into every other row
-        #Repeat for bottom row for other player
 
-#--Generate a Board--#
+#--Generate a table (creates players, sets up a board, populates it with pieces--#
 table = Table()
 
-#And look it all over
-for p in table.pieces:
-    print(p.owner.name + ", " + p.name + ", charge:" + str(p.charge))
-for s in table.spaces:
-    print(s.name)
+#Take a look at the board
+table.view_board()
