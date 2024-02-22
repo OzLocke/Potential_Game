@@ -1,5 +1,6 @@
 # Import math library
 import math
+import numpy as np
 
 class Table():
 
@@ -83,10 +84,26 @@ class Table():
             else:
                 print("{0} | {1} (Charge: {2}, Owner: {3})".format(e[0],e[2].name,str(e[2].charge),e[2].owner.name))
 
+    def test_piece(self, piece):
+        #Takes a piece. Checks neighbours and returns a list of empty spaces.
+        #Convert board into a numpy array
+        df = np.array(self.board)
+        #Get the indices of the subarray that contains the piece (col_indices is not used, but the functin requires it exist)
+        row_indices, col_indices = np.nonzero(df == piece)
+        #Pull the row itself, using ravel to remove excess arrays (e.g. turns [[0,1]] to [0,1])
+        subarray_row = np.ravel(df[row_indices])
+        #Get values from the piece!
+        name = piece.name
+        owner = piece.owner
+        owner_name = owner.name
+        space = subarray_row[1]
+        space_q = space.q
+        space_r = space.r
+        print("{0} is owned by {1} and is at space {2},{3}".format(name, owner_name, space_q, space_r))
 
 
 #--Generate a table (creates players, sets up a board, populates it with pieces--#
 table = Table()
 
 #Take a look at the board
-table.view_board()
+table.test_piece(table.board[0][2])
