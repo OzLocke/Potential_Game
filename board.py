@@ -23,7 +23,7 @@ class Table():
 
     def __init__(self, board_size = 7):
         self.players = []
-        self.board_size = board_size
+        
         self.board = []
         
         #Create the players, store them in an array so they don't need to be assigned to variables
@@ -32,15 +32,15 @@ class Table():
         
         #Map the board
         #First column number of top row
-        start_col = math.floor(self.board_size/2)
+        start_col = math.floor(board_size/2)
         #Number of columns in first row
-        cols = math.ceil(self.board_size/2)
+        cols = math.ceil(board_size/2)
         #Row number of middle row
-        midway = math.ceil(self.board_size/2) - 1
+        midway = math.ceil(board_size/2) - 1
         #Empty array to hold board
         
         #Create each row
-        for r in range(self.board_size):
+        for r in range(board_size):
             #Create each column (q) in the row, appending each to the board
             for q in range(start_col, start_col + cols):
                 #Board contains written address, object, and piece if needed
@@ -84,7 +84,7 @@ class Table():
             else:
                 print("{0} | {1} (Charge: {2}, Owner: {3})".format(e[0],e[2].name,str(e[2].charge),e[2].owner.name))
 
-    def test_piece(self, piece):
+    def piece_location(self, piece):
         #Takes a piece. Checks neighbours and returns a list of empty spaces.
         #Convert board into a numpy array
         df = np.array(self.board)
@@ -93,17 +93,45 @@ class Table():
         #Pull the row itself, using ravel to remove excess arrays (e.g. turns [[0,1]] to [0,1])
         subarray_row = np.ravel(df[row_indices])
         #Get values from the piece!
-        name = piece.name
-        owner = piece.owner
-        owner_name = owner.name
-        space = subarray_row[1]
-        space_q = space.q
-        space_r = space.r
-        print("{0} is owned by {1} and is at space {2},{3}".format(name, owner_name, space_q, space_r))
+        space = subarray_row[1]        
+        return [space.q, space.r]
+
+    def my_pieces(self, player):
+        #Creates a list of pieces owned by the given player
+        #Get the relevant player object from the players array
+        me = self.players[player]
+        #Convert the main board array to a numpy array
+        numpy_board = np.array(self.board)
+        #Get a list of entries from the board array that have pieces
+        filter = numpy_board[(numpy_board[:, 2] != None)]
+        #Create a list of all pieces using the filtered version of the board
+        all_pieces = filter[:,2]
+        #Create the list of pieces that have the required owner
+        #   AFAIK you can't use the filtering method used above
+        #       to filter by values on a stored object
+        #   (there's gotta be a better way to do this! 🤦‍♀️)
+        pieces = [piece for piece in all_pieces if piece.owner == me]
+        print("Hello, {0}. Here are your pieces:".format(me.name))
+        for piece in pieces:
+            location = self.piece_location(piece)
+            print("{0} has {1} charge and is at {2},{3}".format(piece.name, piece.charge, location[0], location[1]))
+
+    def name_player(self, player, name):
+        #Change player name
+        #Store the old name (finding the player in the list of players)
+        old_name = self.players[player].name
+        #Change the name stored on the player object
+        self.players[player].name = name
+        #Store the new name directly from the object (so we can be sure it's worked!)
+        new_name = self.players[player].name
+        #Confirm the change
+        print("Your name has been changed from {0} to {1}".format(old_name, new_name))
+
+        
 
 
 #--Generate a table (creates players, sets up a board, populates it with pieces--#
 table = Table()
 
-#Take a look at the board
-table.test_piece(table.board[0][2])
+table.name_player(0,"Zoe")
+table.my_pieces(0)
