@@ -7,6 +7,28 @@ class Player():
         self.player = player
         self.name = "player{0}".format(player)
     
+    # def my_pieces(self):
+    #     #Creates a list of pieces owned by the given player
+    #     #Get the relevant player object from the players array
+    #     me = self
+    #     #Convert the main board array to a numpy array
+    #     numpy_board = np.array(table.board)
+    #     #Get a list of entries from the board array that have pieces
+    #     filter = numpy_board[(numpy_board[:, 2] != None)]
+    #     #Create a list of all pieces using the filtered version of the board
+    #     all_pieces = filter[:,2]
+    #     #Create the list of pieces that have the required owner
+    #     #   AFAIK you can't use the filtering method used above
+    #     #       to filter by values on a stored object
+    #     #   (there's gotta be a better way to do this! 🤦‍♀️)
+    #     pieces = [piece for piece in all_pieces if piece.owner == me]
+    #     print("Hi, {0}. Here are your pieces:\n".format(me.name))
+    #     for piece in pieces:
+    #         location = table.find_entry(piece)
+    #         print("{0} has {1} charge and is at {2}".format(piece.name, piece.charge, location[0]))
+    #     #Print an empty line
+    #     print("")
+        
     def my_pieces(self):
         #Creates a list of pieces owned by the given player
         #Get the relevant player object from the players array
@@ -22,12 +44,21 @@ class Player():
         #       to filter by values on a stored object
         #   (there's gotta be a better way to do this! 🤦‍♀️)
         pieces = [piece for piece in all_pieces if piece.owner == me]
-        print("Hi, {0}. Here are your pieces:\n".format(me.name))
+        piece_list = []
         for piece in pieces:
-            location = table.piece_location(piece)
-            print("{0} has {1} charge and is at {2},{3}".format(piece.name, piece.charge, location[0], location[1]))
+            location = table.find_entry(piece)
+            piece_list.append([piece, location[1]])
+        return(piece_list)
+
+    def display_my_pieces(self):
+        me = self
+        pieces = self.my_pieces()
+        print("Hi, {0}. Here are your pieces:\n".format(me.name))
+        for entry in pieces:
+            print("{0} has {1} charge and is at {2},{3}".format(entry[0].name, entry[0].charge, entry[1].q, entry[1].r))
         #Print an empty line
         print("")
+
     
     def name_player(self, name):
         #Change player name
@@ -107,15 +138,18 @@ class Table():
                 print("{0} | {1} (Charge: {2}, Owner: {3})".format(e[0],e[2].name,str(e[2].charge),e[2].owner.name))
         #Add an empty line
         print("")
-    
-    def available_moves(self, piece):
-        #Takes a piece. Checks neighbours and returns a list of empty spaces.
+
+    def find_entry(self, search):
         #Convert board into a numpy array
         df = np.array(self.board)
         #Get the indices of the subarray that contains the piece (col_indices is not used, but the functin requires it exist)
-        row_indices, col_indices = np.nonzero(df == piece)
+        row_indices, col_indices = np.nonzero(df == search)
         #Pull the row itself, using ravel to remove excess arrays (e.g. turns [[0,1]] to [0,1])
-        subarray_row = np.ravel(df[row_indices])
+        return(np.ravel(df[row_indices]))
+    
+    def available_moves(self, piece):
+        #Takes a piece. Checks neighbours and returns a list of empty spaces.
+        subarray_row = self.find_entry(piece)
         #Get the space and the piece that has been selected
         space_name = subarray_row[0]
         space = subarray_row[1]
@@ -138,8 +172,7 @@ class Table():
             #Create the target space reference
             target = [space.q + test[0],space.r + test[1]]
             #Get the space from the board
-            row_indices, col_indices = np.nonzero(df == "{0},{1}".format(target[0],target[1]))
-            target_space = np.ravel(df[row_indices])
+            target_space = self.find_entry("{0},{1}".format(target[0],target[1]))
             #If the selected test space exists...
             available = []
             if target_space.size:
@@ -150,8 +183,7 @@ class Table():
                     #Create the new target space reference
                     new_target = [target[0] + test[0],target[1] + test[1]]
                     #Get the space from the board
-                    row_indices, col_indices = np.nonzero(df == "{0},{1}".format(new_target[0],new_target[1]))
-                    new_target_space = np.ravel(df[row_indices])
+                    new_target_space = self.find_entry("{0},{1}".format(new_target[0],new_target[1]))
                     #If the selected test space exists...
                     if new_target_space.size:
                         available = [target_space, new_target_space]
@@ -195,28 +227,40 @@ class Table():
             print(text)
 
                 
-
-
-
+    def get_piece(self, player, piece):
+        #Find the piece by owner and name
+        #Get the player object
+        pieces = player.my_pieces()
+        piece = pieces[piece]
+        return(piece[0])
     
     def list_players(self):
         print("This table seats the following players:\n")
         names = [p.name for p in players]
         print(", ".join(map(str,names)) + "\n")
         # print(names)
+    
+class Tests():
+    def test_setup(self):
+        table.list_players()
+        players[0].name_player("Zoe")
+        players[1].name_player("Stef")
+        table.list_players()
+        players[0].my_pieces()
+        players[1].my_pieces()
+        table.view_board()
+    
+    def test_interaction(self):
+        current_player = players[1]
+        current_player.display_my_pieces()
+        selected_piece = 4
+        piece = table.get_piece(current_player, selected_piece)
+        table.available_moves(piece)
 
 #--Generate a table (creates players, sets up a board, populates it with pieces)--#
 players = [Player(0), Player(1)]
 table = Table(5)
-# table.list_players()
-# players[0].name_player("Zoe")
-# players[1].name_player("Stef")
-# table.list_players()
-# players[0].my_pieces()
-# players[1].my_pieces()
-#table.view_board()
-
-#get a piece from the board
-# piece = table.board[0][2]
-# print(piece.name)
-table.available_moves(table.board[0][2])
+tester = Tests()
+tester.test_setup()
+print("\n----------------------------------\n")
+tester.test_interaction()
