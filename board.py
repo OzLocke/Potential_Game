@@ -82,10 +82,6 @@ class Table():
         #Populate the board with pieces
         #Find last row
         bottom_row = self.board_size - 1
-        # for e in self.board:
-        #     row = e[1].r
-        #     if row > bottom_row:
-        #         bottom_row = row
         #Loop over the players so we can assign their objects as owners
         for p in players:
             piece = 0
@@ -112,7 +108,7 @@ class Table():
         #Add an empty line
         print("")
     
-    def piece_location(self, piece):
+    def available_moves(self, piece):
         #Takes a piece. Checks neighbours and returns a list of empty spaces.
         #Convert board into a numpy array
         df = np.array(self.board)
@@ -120,33 +116,88 @@ class Table():
         row_indices, col_indices = np.nonzero(df == piece)
         #Pull the row itself, using ravel to remove excess arrays (e.g. turns [[0,1]] to [0,1])
         subarray_row = np.ravel(df[row_indices])
-        #Get piece!
-        space = subarray_row[1] 
-        #Get neighbours
-        r = space.r
-        q = space.q
-        #Find columns on this row
-        cols_on_r = [i[1].q for i in self.board if i[1] != None and i[1].r == r]
-        #Find the min and max cols on this row
-        first_q = min(cols_on_r)
-        last_q = max(cols_on_r)
-        #Is the piece on an end column?
-        on_left_edge = q == first_q
-        on_right_edge = q == last_q
-        #Is it on the bottom or top?
-        on_top = r == 0
-        on_bottom = r == self.board_size - 1
-        #From north west, where should we start scanning?
-        scan_start = []
-        if on_bottom: 
-            #scan starts on the row above and one to the left (NW)
-            scan_start = [r - 1, q - 1]
-        if on_top:
-            #scan starts on the row below and one to the right (SE)
-            scan_start = [r + 1, q + 1]
+        #Get the space and the piece that has been selected
+        space_name = subarray_row[0]
+        space = subarray_row[1]
+        piece = subarray_row[2]
+        piece_name = piece.name
+        #Prepare storage for available moves
+        moves = []
+        #What changes need to be made to the space reference to check neighbours?
+        #[[NW],[NE],[W],[E],[SW],[SE]]
+        scan = [[0,-1],[+1,-1],[-1,0],[+1,0],[-1,+1],[0,+1]]
+        #Run through the scan array checking the spaces
+        print("Selected piece:")
+        print("{0} is at {1} and has {2} charge".format(
+            piece_name,
+            space_name,
+            piece.charge
+            )
+        )
+        for test in scan:
+            #Create the target space reference
+            target = [space.q + test[0],space.r + test[1]]
+            #Get the space from the board
+            row_indices, col_indices = np.nonzero(df == "{0},{1}".format(target[0],target[1]))
+            target_space = np.ravel(df[row_indices])
+            #If the selected test space exists...
+            available = []
+            if target_space.size:
+                #First store the space
+                available = [target_space, []]
+                #Then if it had a piece in it...
+                if target_space[2] != None:
+                    #Create the new target space reference
+                    new_target = [target[0] + test[0],target[1] + test[1]]
+                    #Get the space from the board
+                    row_indices, col_indices = np.nonzero(df == "{0},{1}".format(new_target[0],new_target[1]))
+                    new_target_space = np.ravel(df[row_indices])
+                    #If the selected test space exists...
+                    if new_target_space.size:
+                        available = [target_space, new_target_space]
+                #And finally add it all the the moves list
+                moves.append(available)
+                
+
+        print("\nAvailable moves:")
+        #Loop over the moves, writing them out
+        for move in moves:
+            text = ""
+            #If the space is free
+            if move[0][2] == None:
+                text = "Space {0} is free".format(move[0][0])
+            #Otherwise check for jumps
+            else:
+                #This is just used to say whether the piece is yours or not
+                opponent = ""
+                if  move[0][2].owner != piece.owner:
+                    opponent = "opponent's "
+                #Check if the piece can be jumped
+                jumpable = False
+                jump_text = ""
+                #If this passes, there's a valid space at the next location
+                if len(move[1]) > 0:
+                    #If there's no piece there, it's a valid move
+                    if move[1][2] == None:
+                        jumpable = True
+                        jump_text = " This piece can be jumped, landing in space {0}".format(move[1][0])
+                    #If there is a piece there, jumpable can stay False, and we add a reason
+                    else: jump_text = " This piece cannot be jumped because the space beyond it is ocupied"
+                #If there's no valid space, we add that as a reason
+                else: jump_text = " This piece cannot be jumped because there is no space beyond it"
+                text = "Space {0} contains your {1}piece, {2}, which has {3} charge.{4}.".format(
+                    move[0][0],
+                    opponent,
+                    move[0][2].name,
+                    move[0][2].charge,
+                    jump_text
+                    )
+            print(text)
+
+                
 
 
-        return [space.q, space.r]
+
     
     def list_players(self):
         print("This table seats the following players:\n")
@@ -156,12 +207,16 @@ class Table():
 
 #--Generate a table (creates players, sets up a board, populates it with pieces)--#
 players = [Player(0), Player(1)]
-table = Table()
+table = Table(5)
 # table.list_players()
 # players[0].name_player("Zoe")
 # players[1].name_player("Stef")
 # table.list_players()
 # players[0].my_pieces()
 # players[1].my_pieces()
-# table.view_board()
-table.piece_location(table.board[0][1])
+#table.view_board()
+
+#get a piece from the board
+# piece = table.board[0][2]
+# print(piece.name)
+table.available_moves(table.board[0][2])
