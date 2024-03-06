@@ -13,7 +13,7 @@ class Tests():
                 view.display_my_pieces(players_df[0], board_df)
             case "moves":
                 piece = board_df[0][2]
-                view.display_moves(board, piece, board_df, players_df[0])
+                view.display_moves(piece, board_df, players_df[0])
             case _:
                 print("That's not a valid test, use \"help\" for a list of tests")
         
@@ -43,7 +43,7 @@ board_df = board.set_up()
 
 # Run a test!
 tests = Tests()
-tests.displays("moves")
+tests.displays("board")
 tests.functions("name_change")
 
 view.list_players(players_df)

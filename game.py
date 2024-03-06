@@ -1,6 +1,5 @@
 import math
 import numpy as np
-import tools
 
 class Player():
     def __init__(self, player):
@@ -24,7 +23,7 @@ class Player():
         pieces = [piece for piece in all_pieces if piece.owner == me]
         piece_list = []
         for piece in pieces:
-            location = tools.query_subarray(board_df, piece)
+            location = search(board_df, 2, piece)
             piece_list.append([piece, location[1]])
         return(piece_list)
     
@@ -32,6 +31,7 @@ class Player():
         #Change player name
         old_name = self.name
         self.name = new_name
+        return(old_name, new_name)
 
 class Piece():
     def __init__(self, name, owner, charge = 3):
@@ -43,7 +43,7 @@ class Piece():
     def available_moves(self, board_df):
         piece = self
         #Takes a piece. Checks neighbours and returns a list of empty spaces.
-        subarray_row = tools.query_subarray(board_df, piece)
+        subarray_row = search(board_df, 2, piece)
         #Get the space and the piece that has been selected
         space = subarray_row[1]
         piece = subarray_row[2]
@@ -58,7 +58,7 @@ class Piece():
             #Create the target space reference
             target = [space.q + test[0],space.r + test[1]]
             #Get the space from the board
-            target_space = tools.query_subarray(board_df, "{0},{1}".format(target[0],target[1]))
+            target_space = search(board_df, 0, "{0},{1}".format(target[0],target[1]))
             available = []
             #If the selected test space exists...
             if target_space.size:
@@ -69,7 +69,7 @@ class Piece():
                     #Create the new target space reference
                     new_target = [target[0] + test[0],target[1] + test[1]]
                     #Get the space from the board
-                    new_target_space = tools.query_subarray(board_df, "{0},{1}".format(new_target[0],new_target[1]))
+                    new_target_space = search(board_df, 0, "{0},{1}".format(new_target[0],new_target[1]))
                     #If the selected test space exists...
                     if new_target_space.size:
                         available = [target_space, new_target_space]
@@ -191,6 +191,23 @@ class Board():
             board_layout.append(e)
         return(board_layout)
 
+def search(df, position, target):
+    result = []
+    for i in df:
+        if i[position] == target:
+            result = i
+    return(result)
 
+# Build dataframes
+#Set up players
+player_count = 2
+players_df = []
+for i in range(0, player_count):
+    players_df.append(Player(i))
 
+# Set up the board
+board_size = 5
+board = Board(players_df, board_size)
+board_df = board.set_up()
 
+print(players_df[0].my_pieces(board_df))

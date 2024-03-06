@@ -30,13 +30,13 @@ def display_my_pieces(player, board_df):
         print("")
 
 
-def display_moves(board, piece, board_df, player):
+def display_moves(piece, board_df, player):
     your_piece = piece.owner == player
     if not your_piece:
         print("Sorry, that piece belongs to your opponent.")
         return
 	
-    piece_info, move_list = board.available_moves(piece, board_df)
+    piece_info, move_list = piece.available_moves(board_df)
     print("You selected {0}, at {1},{2}, which has {3} charge.".format(
         piece_info.get("Piece").name, 
         piece_info.get("Space").q, 
