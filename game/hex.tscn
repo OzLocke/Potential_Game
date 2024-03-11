@@ -1,0 +1,9 @@
+[gd_scene load_steps=3 format=3 uid="uid://8r5csojgkiib"]
+
+[ext_resource type="Texture2D" uid="uid://2e12c7clobng" path="res://assets/hex.svg" id="1_323kd"]
+[ext_resource type="Script" path="res://hex.gd" id="2_4f5hc"]
+
+[node name="Hex" type="Sprite2D"]
+modulate = Color(1, 1, 1, 0.423529)
+texture = ExtResource("1_323kd")
+script = ExtResource("2_4f5hc")
