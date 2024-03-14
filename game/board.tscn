@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3 uid="uid://b3db5fbsx1yts"]
+[gd_scene load_steps=3 format=3 uid="uid://b3db5fbsx1yts"]
 
 [ext_resource type="PackedScene" uid="uid://8r5csojgkiib" path="res://hex.tscn" id="1_c2ema"]
+[ext_resource type="Script" path="res://board.gd" id="1_vfpam"]
 
 [node name="Board" type="AspectRatioContainer"]
 anchors_preset = 8
@@ -10,6 +11,7 @@ anchor_right = 0.5
 anchor_bottom = 0.5
 grow_horizontal = 2
 grow_vertical = 2
+script = ExtResource("1_vfpam")
 
 [node name="Hex" parent="." groups=["spaces"] instance=ExtResource("1_c2ema")]
 position = Vector2(-198, -342)
