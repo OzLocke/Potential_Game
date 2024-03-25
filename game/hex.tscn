@@ -1,9 +1,19 @@
-[gd_scene load_steps=3 format=3 uid="uid://8r5csojgkiib"]
+[gd_scene load_steps=4 format=3 uid="uid://8r5csojgkiib"]
 
-[ext_resource type="Texture2D" uid="uid://2e12c7clobng" path="res://assets/hex.svg" id="1_323kd"]
 [ext_resource type="Script" path="res://hex.gd" id="2_4f5hc"]
+[ext_resource type="Texture2D" uid="uid://ccpruhheeo8ih" path="res://assets/hex.png" id="2_qe1nh"]
 
-[node name="Hex" type="Sprite2D"]
+[sub_resource type="CircleShape2D" id="CircleShape2D_lchd3"]
+radius = 99.6
+
+[node name="Hex" type="Area2D"]
 modulate = Color(1, 1, 1, 0.423529)
-texture = ExtResource("1_323kd")
 script = ExtResource("2_4f5hc")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("2_qe1nh")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_lchd3")
+
+[connection signal="input_event" from="." to="." method="_on_input_event"]

@@ -1,14 +1,19 @@
 extends Area2D
 
-var colours = [Color("Red",0.5),Color("Blue", 0.5)]
+var colours = [Color("Red"),Color("Blue")]
 var charge
 var location
-
+var move_choices = []
+var moves
+var selected = false
+var pos = null
+signal move_complete
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	#Set up piece
 	#Set charge
 	charge = 3
+	moves = charge
 	#Set colour based on owner
 	$Sprite.modulate = colours[get_parent().player_number]
 	#Add to group (note the group is created when the first piece is added to it
@@ -18,13 +23,26 @@ func _ready():
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta):
-	pass
+	if pos != null:
+		global_position = global_position.move_toward(pos, 10)
+	if global_position == pos:
+		move_complete.emit()
+	if selected:
+		$Label.text = "%s/%s" % [moves,charge]
+	else:
+		$Label.text = "%s" % [charge]
 
 func _on_input_event(viewport, event, shape_idx):
 	if Input.is_action_just_released("Click"):
+		#Set all pieces to not selected
+		for piece in get_tree().get_nodes_in_group("pieces"):
+			selected = false
+		#Set this piece to selected
+		selected = true
 		#Reset all spaces to default colour
 		for space in get_tree().get_nodes_in_group("spaces"):
-			space.modulate = "ffffff6c"
+			space.clear()
+		#Display available moves for the selected piece
 		available_moves()
 
 func available_moves():
@@ -69,14 +87,14 @@ func available_moves():
 		#Based on the above conditions, colour available move spaces and register move details		
 		if target_1_real and target_1_free:
 			for space in spaces:
-				if space.q == target_1[0] and space.r == target_1[1]:
+				if space.q == target_1[0] and space.r == target_1[1] and self.moves >= 1:
 					moves.append([target_1, null])
-					space.modulate = Color("Green")
-		elif target_2_real and target_2_free:
+					space.highlight()
+		elif target_2_real and target_2_free and self.moves >= 2:
 			for space in spaces:
 				if space.q == target_2[0] and space.r == target_2[1]:
 					moves.append([target_2, target_1])
-					space.modulate = Color("Green")
+					space.highlight()
 					
 	#Use jumps to create a list of target spaces and jumped pieces
 	var move_nodes = []
@@ -92,9 +110,30 @@ func available_moves():
 			for piece in pieces:
 				if piece.location.q == move[1][0] and piece.location.r == move[1][1]:
 					nodes.append(piece)
+		else:
+			nodes.append(null)
 		#overwrite jump with new data
 		move_nodes.append(nodes)
+	#update the main moves variable with the list of current moves	
+	move_choices = move_nodes
 		
-	print(move_nodes)
-		
-		
+func move(destination):
+	#move the selcted piece
+	for move in move_choices:
+		if move[0] == destination:
+			if move[1] != null:
+				moves -= 2
+				move[1].charge -= 1
+				charge += 1
+			else:
+				moves -= 1
+			print(moves)
+	pos = destination.global_position
+	selected = false
+	location = destination
+
+func _on_move_complete():
+	pos = null
+	#Reset all spaces to default colour
+	for space in get_tree().get_nodes_in_group("spaces"):
+		space.clear()
