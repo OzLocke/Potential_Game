@@ -4,16 +4,20 @@ var colours = [Color("Red"),Color("Blue")]
 var charge
 var location
 var move_choices = []
-var moves
+var moves_remaining
 var selected = false
-var pos = null
+var current_pos = null
+var game
+var piece_owner
+var destroy_piece
 signal move_complete
+
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	#Set up piece
-	#Set charge
-	charge = 3
-	moves = charge
+	game = get_parent().get_parent()
+	piece_owner = get_parent()
+	self.charge = 3
+	self.moves_remaining = charge
 	#Set colour based on owner
 	$Sprite.modulate = colours[get_parent().player_number]
 	#Add to group (note the group is created when the first piece is added to it
@@ -23,30 +27,32 @@ func _ready():
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta):
-	if pos != null:
-		global_position = global_position.move_toward(pos, 10)
-	if global_position == pos:
+	if self.current_pos != null:
+		self.global_position = self.global_position.move_toward(self.current_pos, 10)
+	if self.global_position == self.current_pos:
 		move_complete.emit()
 	if selected:
-		$Label.text = "%s/%s" % [moves,charge]
+		$Label.text = "%s/%s" % [self.moves_remaining,self.charge]
 	else:
-		$Label.text = "%s" % [charge]
+		$Label.text = "%s" % [self.charge]
 
 func _on_input_event(viewport, event, shape_idx):
-	if Input.is_action_just_released("Click"):
+	if Input.is_action_just_released("Click") and self.game.active_player == self.piece_owner and self.selected == false and self.game.state == "waiting":
+		self.game.state = "playing"
 		#Set all pieces to not selected
 		for piece in get_tree().get_nodes_in_group("pieces"):
-			selected = false
+			piece.selected = false
 		#Set this piece to selected
-		selected = true
-		#Reset all spaces to default colour
-		for space in get_tree().get_nodes_in_group("spaces"):
-			space.clear()
+		self.selected = true
+		self.moves_remaining = self.charge
 		#Display available moves for the selected piece
 		available_moves()
 
 func available_moves():
 	#Finds available moves for a piece when it is clicked
+	#Reset all spaces to default colour
+	for space in get_tree().get_nodes_in_group("spaces"):
+		space.clear()
 	#What changes need to be made to the space reference to check neighbours?
 	#[[NW],[NE],[W],[E],[SW],[SE]]
 	var scan = [[0,-1],[+1,-1],[-1,0],[+1,0],[-1,+1],[0,+1]]
@@ -54,9 +60,10 @@ func available_moves():
 	var pieces = get_tree().get_nodes_in_group("pieces")
 	var spaces = get_tree().get_nodes_in_group("spaces")
 	var moves = []
+	self.move_choices = []
 	for test in scan:
 		#Set the target addresses to test in relation to the piece's current space
-		var target_1 = [location.q + test[0], location.r + test[1]]
+		var target_1 = [self.location.q + test[0], self.location.r + test[1]]
 		var target_2 = [target_1[0] + test[0], target_1[1] + test[1]]
 		
 		#is the taget a real space?
@@ -87,10 +94,10 @@ func available_moves():
 		#Based on the above conditions, colour available move spaces and register move details		
 		if target_1_real and target_1_free:
 			for space in spaces:
-				if space.q == target_1[0] and space.r == target_1[1] and self.moves >= 1:
+				if space.q == target_1[0] and space.r == target_1[1] and self.moves_remaining >= 1:
 					moves.append([target_1, null])
 					space.highlight()
-		elif target_2_real and target_2_free and self.moves >= 2:
+		elif target_2_real and target_2_free and self.moves_remaining >= 1:
 			for space in spaces:
 				if space.q == target_2[0] and space.r == target_2[1]:
 					moves.append([target_2, target_1])
@@ -115,25 +122,41 @@ func available_moves():
 		#overwrite jump with new data
 		move_nodes.append(nodes)
 	#update the main moves variable with the list of current moves	
-	move_choices = move_nodes
+	self.move_choices = move_nodes
 		
 func move(destination):
 	#move the selcted piece
-	for move in move_choices:
-		if move[0] == destination:
-			if move[1] != null:
-				moves -= 2
-				move[1].charge -= 1
-				charge += 1
-			else:
-				moves -= 1
-			print(moves)
-	pos = destination.global_position
-	selected = false
-	location = destination
+	for move in self.move_choices:
+		if move[0] == destination and move[1] != null:
+			move[1].charge -= 1
+			if move[1].charge <= 0:
+				self.destroy_piece = move[1]
+			self.charge += 1
+	self.moves_remaining -= 1
+	self.current_pos = destination.global_position
+	self.location = destination
 
 func _on_move_complete():
-	pos = null
+	self.current_pos = null
 	#Reset all spaces to default colour
 	for space in get_tree().get_nodes_in_group("spaces"):
 		space.clear()
+	if self.destroy_piece != null:
+		self.destroy_piece.remove_from_group("pieces")
+		self.destroy_piece.queue_free()
+		self.destroy_piece = null
+	if self.moves_remaining <= 0:
+		end_turn()
+	else:
+		available_moves()
+
+func show_state():
+	#Denotes that the pieces are active during your turn
+	if self.game.active_player == self.piece_owner:
+		$Sprite.modulate.a = 1
+	else:
+		$Sprite.modulate.a = 0.5
+		
+func end_turn():
+	self.selected = false
+	get_parent().get_parent().get_node("Board").new_turn()
