@@ -1,5 +1,5 @@
 extends Node2D
-var player_name = self.name
+@export var player_name = "player"
 @export var player_number = 0
 var start_locations = [
 	#Player 1

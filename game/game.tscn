@@ -20,8 +20,10 @@ mouse_filter = 2
 stretch_mode = 3
 
 [node name="Player1" parent="." groups=["players"] instance=ExtResource("2_dnefa")]
+player_name = "Red"
 
 [node name="Player2" parent="." groups=["players"] instance=ExtResource("2_dnefa")]
+player_name = "Blue"
 player_number = 1
 
 [node name="CurrentPlayer" type="Label" parent="."]

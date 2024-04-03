@@ -1,20 +1,27 @@
 extends Area2D
-
+#values for identifying owner
 var colours = [Color("Red"),Color("Blue")]
+var piece_owner
+#values for managing piece from a game level
 var charge
 var location
-var move_choices = []
+var jumpable = true
 var moves_remaining
+#values for managing piece from a code level
 var selected = false
 var current_pos = null
-var game
-var piece_owner
+var move_choices = []
 var destroy_piece
+#node storage
+var game
+var board
+#signals
 signal move_complete
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	game = get_parent().get_parent()
+	board = get_parent().get_parent().get_node("Board")
 	piece_owner = get_parent()
 	self.charge = 3
 	self.moves_remaining = charge
@@ -84,10 +91,10 @@ func available_moves():
 			if space.q == target_2[0] and space.r == target_2[1]:
 				target_2_real = true
 				break
-		#is there a piece in the space?
+		#is the second space empty, and the jumped piece is jumpable?
 		var target_2_free = true
 		for piece in pieces:
-			if piece.location.q == target_2[0] and piece.location.r == target_2[1]:
+			if (piece.location.q == target_2[0] and piece.location.r == target_2[1]) or (piece.location.q == target_1[0] and piece.location.r == target_1[1] and piece.jumpable == false):
 				target_2_free = false
 				break
 		
@@ -127,11 +134,19 @@ func available_moves():
 func move(destination):
 	#move the selcted piece
 	for move in self.move_choices:
-		if move[0] == destination and move[1] != null:
-			move[1].charge -= 1
-			if move[1].charge <= 0:
-				self.destroy_piece = move[1]
-			self.charge += 1
+		if move[0] == destination:
+			if move[1] != null:
+				#move[1] is the jumped piece
+				move[1].charge -= 1
+				move[1].jumpable = false
+				if move[1].charge <= 0:
+					self.destroy_piece = move[1]
+				self.charge += 1
+			else:
+				#If the move didn't involve jumping a piece, all pieces are set to jumpable again
+				for piece in get_tree().get_nodes_in_group("pieces"):
+					piece.jumpable = true
+		
 	self.moves_remaining -= 1
 	self.current_pos = destination.global_position
 	self.location = destination
@@ -158,5 +173,10 @@ func show_state():
 		$Sprite.modulate.a = 0.5
 		
 func end_turn():
+	#deselect piece
 	self.selected = false
-	get_parent().get_parent().get_node("Board").new_turn()
+	#set all pieces as jumpable
+	for piece in get_tree().get_nodes_in_group("pieces"):
+		piece.jumpable = true
+	#trigger a new turn
+	self.board.new_turn()
