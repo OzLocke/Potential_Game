@@ -3,9 +3,9 @@ extends Node2D
 @export var player_number = 0
 var start_locations = [
 	#Player 1
-	[[2,0],[3,0],[4,0],[2,1],[3,1]],
+	[[2,0],[3,0],[4,0]],
 	#Player 2
-	[[1,3],[2,3],[0,4],[1,4],[2,4]]
+	[[0,4],[1,4],[2,4]]
 	]
 var piece = preload("res://piece.tscn")
 var my_pieces = []
