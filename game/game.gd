@@ -1,11 +1,16 @@
 extends Control
 var state
 var active_player
+#Rules inlcude "2_to_jump", "no_double_jumps"
+var rules = ["2_to_jump","no_double_jumps"]
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	active_player = $Player1
 	$CurrentPlayer.text = "%s's turn" % [active_player.player_name]
+	$Rules.text = "Rules:"
+	for rule in rules:
+		$Rules.text = $Rules.text + "\n" + rule.replace("_", " ")
 	for piece in get_tree().get_nodes_in_group("pieces"):
 		piece.show_state()
 	self.state = "waiting"

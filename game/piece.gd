@@ -7,6 +7,7 @@ var charge
 var location
 var jumpable = true
 var moves_remaining
+var jump_cost = 1
 #values for managing piece from a code level
 var selected = false
 var current_pos = null
@@ -25,6 +26,7 @@ func _ready():
 	piece_owner = get_parent()
 	self.charge = 3
 	self.moves_remaining = charge
+	if "2_to_jump" in game.rules: self.jump_cost = 2
 	#Set colour based on owner
 	$Sprite.modulate = colours[get_parent().player_number]
 	#Add to group (note the group is created when the first piece is added to it
@@ -39,7 +41,9 @@ func _process(_delta):
 	if self.global_position == self.current_pos:
 		move_complete.emit()
 	if selected:
-		$Label.text = "%s/%s" % [self.moves_remaining,self.charge]
+		var moves_counter = self.moves_remaining
+		if moves_counter < 0: moves_counter = 0
+		$Label.text = "%s/%s" % [moves_counter,self.charge]
 	else:
 		$Label.text = "%s" % [self.charge]
 
@@ -94,9 +98,15 @@ func available_moves():
 		#is the second space empty, and the jumped piece is jumpable?
 		var target_2_free = true
 		for piece in pieces:
-			if (piece.location.q == target_2[0] and piece.location.r == target_2[1]) or (piece.location.q == target_1[0] and piece.location.r == target_1[1] and piece.jumpable == false):
+			if piece.location.q == target_2[0] and piece.location.r == target_2[1]:
 				target_2_free = false
 				break
+		#Is the piece jumpable (only active if given rule is active)
+		if "no_double_jumps" in game.rules:
+			for piece in pieces:
+				if piece.location.q == target_1[0] and piece.location.r == target_1[1] and piece.jumpable == false:
+					target_2_free = false
+					break
 		
 		#Based on the above conditions, colour available move spaces and register move details		
 		if target_1_real and target_1_free:
@@ -104,7 +114,7 @@ func available_moves():
 				if space.q == target_1[0] and space.r == target_1[1] and self.moves_remaining >= 1:
 					moves.append([target_1, null])
 					space.highlight()
-		elif target_2_real and target_2_free and self.moves_remaining >= 1:
+		elif target_2_real and target_2_free and self.moves_remaining >= jump_cost:
 			for space in spaces:
 				if space.q == target_2[0] and space.r == target_2[1]:
 					moves.append([target_2, target_1])
@@ -146,8 +156,8 @@ func move(destination):
 				#If the move didn't involve jumping a piece, all pieces are set to jumpable again
 				for piece in get_tree().get_nodes_in_group("pieces"):
 					piece.jumpable = true
-		
-	self.moves_remaining -= 1
+
+	self.moves_remaining -= jump_cost
 	self.current_pos = destination.global_position
 	self.location = destination
 
