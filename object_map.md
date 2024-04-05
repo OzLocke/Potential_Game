@@ -4,33 +4,63 @@
 classDiagram
     Game <|-- Board
     Game <|-- Player
-    Board <|-- Space
+    Board <|-- Hex
     Player <|-- Piece
 
     class Game{
-        +lst color_mode
-        set_color_mode()
-        end_game()
-        restart_game()
+        ext Control
+        str state
+        obj active_player
+        lst rules
+        _ready()
+        _process()
+        set_state()
+        change_turn()
     }
     class Board{
-        +int size
-        set_size()
-        setup()
+        ext AspectRatioContainer
+        new_turn()
     }
     class Player{
-        +str name
-        change_name()
+        ext Node2D
+        str player_name
+        int player_number
+        lst2D start_locations
+        tscn piece
+        _ready()
     }
-    class Space{
-        +int q
-        +int r
-        highlight_self()
+    class Hex{
+        ext Area2D
+        int q
+        int r
+        bool highlighted
+        highlight()
+        clear()
+        _on_input_event()
     }
     class Piece{
-        +int charge
-        show_moves()
+        ext Area2D
+        lst colours
+        obj piece_owner
+        int charge
+        obj location
+        bool jumpable
+        int moves_remaining
+        int jump_cost
+        bool selected
+        vec2 current_pos
+        lst move_choices
+        obj destroy_piece
+        obj game
+        obj board
+        sig move_completed
+        _ready()
+        _process()
+        _on_input_event()
+        available_moves()
         move()
-        adjust_charge()
+        _on_move_complete()
+        show_state()
+        end_turn()
     }
 ```

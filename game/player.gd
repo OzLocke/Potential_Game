@@ -8,7 +8,6 @@ var start_locations = [
 	[[0,4],[1,4],[2,4]]
 	]
 var piece = preload("res://piece.tscn")
-var my_pieces = []
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -20,7 +19,6 @@ func _ready():
 			var instance = piece.instantiate()
 			instance.global_position = space.global_position
 			instance.location = space
-			my_pieces.append(instance)
 			add_child(instance)
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
