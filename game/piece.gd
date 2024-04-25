@@ -13,11 +13,13 @@ var selected = false
 var current_pos = null
 var move_choices = []
 var destroy_piece
+var moving = false
 #node storage
 var game
 var board
 #signals
 signal move_complete
+
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -36,10 +38,13 @@ func _ready():
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta):
+	#Move the piece
 	if self.current_pos != null:
 		self.global_position = self.global_position.move_toward(self.current_pos, 10)
-	if self.global_position == self.current_pos:
+	if self.global_position == self.current_pos and self.moving == true:
 		move_complete.emit()
+	
+	#Display info on the piece
 	if selected:
 		var moves_counter = self.moves_remaining
 		if moves_counter < 0: moves_counter = 0
@@ -143,8 +148,11 @@ func available_moves():
 		
 func move(destination):
 	#move the selcted piece
+	var pieces_group = get_tree().get_nodes_in_group("pieces")
 	for move in self.move_choices:
+		#Runs only on the chosen move
 		if move[0] == destination:
+			#If a piece is jumped
 			if move[1] != null:
 				#move[1] is the jumped piece
 				move[1].charge -= 1
@@ -152,16 +160,19 @@ func move(destination):
 				if move[1].charge <= 0:
 					self.destroy_piece = move[1]
 				self.charge += 1
+				self.moves_remaining -= jump_cost
 			else:
 				#If the move didn't involve jumping a piece, all pieces are set to jumpable again
-				for piece in get_tree().get_nodes_in_group("pieces"):
+				for piece in pieces_group:
 					piece.jumpable = true
-
-	self.moves_remaining -= jump_cost
+				self.moves_remaining -= 1
+					
 	self.current_pos = destination.global_position
 	self.location = destination
+	self.moving = true
 
 func _on_move_complete():
+	self.moving = false
 	self.current_pos = null
 	#Reset all spaces to default colour
 	for space in get_tree().get_nodes_in_group("spaces"):
@@ -170,10 +181,18 @@ func _on_move_complete():
 		self.destroy_piece.remove_from_group("pieces")
 		self.destroy_piece.queue_free()
 		self.destroy_piece = null
-	if self.moves_remaining <= 0:
+	var game_over = true
+	for piece in get_tree().get_nodes_in_group("pieces"):
+		if piece.piece_owner != self.piece_owner:
+			game_over = false
+			break
+	if game_over:
+		self.game.game_over()
+	elif self.moves_remaining <= 0:
 		end_turn()
 	else:
 		available_moves()
+	
 
 func show_state():
 	#Denotes that the pieces are active during your turn
@@ -189,4 +208,4 @@ func end_turn():
 	for piece in get_tree().get_nodes_in_group("pieces"):
 		piece.jumpable = true
 	#trigger a new turn
-	self.board.new_turn()
+	self.game.end_turn()

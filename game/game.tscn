@@ -1,8 +1,9 @@
-[gd_scene load_steps=4 format=3 uid="uid://drp3he8kumyk5"]
+[gd_scene load_steps=5 format=3 uid="uid://drp3he8kumyk5"]
 
 [ext_resource type="Script" path="res://game.gd" id="1_mmeew"]
 [ext_resource type="PackedScene" uid="uid://b3db5fbsx1yts" path="res://board.tscn" id="1_y254d"]
 [ext_resource type="PackedScene" uid="uid://ou7bpllddece" path="res://player.tscn" id="2_dnefa"]
+[ext_resource type="PackedScene" uid="uid://bskkonm8k08u2" path="res://end_screen.tscn" id="4_a3qmi"]
 
 [node name="Game" type="Control"]
 layout_mode = 3
@@ -47,3 +48,7 @@ theme_override_font_sizes/font_size = 50
 text = "Active Rules"
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="EndScreen" parent="." instance=ExtResource("4_a3qmi")]
+visible = false
+layout_mode = 1
