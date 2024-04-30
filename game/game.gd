@@ -17,19 +17,19 @@ func _ready():
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
-	pass
+	if self.state == "game_over":
+		$EndScreen.visible = true
 
 func set_state(state):
-	state = state
+	self.state = state
 	
-func end_turn(current_player):
+func end_turn():
 	#Lose a point of charge if at the Bleeding Edge
 	for piece in get_tree().get_nodes_in_group("pieces"):	
 		if piece.location.outer:
 			piece.charge -= 1
 		if piece.charge <= 0:
 			piece.queue_free()
-		check_game(current_player)
 	
 	var players = get_tree().get_nodes_in_group("players")
 	var active_player_index = players.find(active_player)
@@ -42,13 +42,20 @@ func end_turn(current_player):
 		
 	self.state = "waiting"
 	
-func check_game(current_player):
-	var game_over = true
+	check_game()
+	
+func check_game():
+	var player_1 = $Player1
+	var player_2 = $Player2
+	var p1_pieces = 0
+	var p2_pieces = 0
 	for piece in get_tree().get_nodes_in_group("pieces"):
-		if piece.piece_owner != current_player:
-			game_over = false
-			break
-	if game_over:
+		if piece.piece_owner == player_1:
+			p1_pieces += 1
+		if piece.piece_owner == player_2:
+			p2_pieces += 1
+	if p1_pieces <= 0 or p2_pieces <= 0:
+		print("game over")
 		self.set_state("game_over")
-		$EndScreen.visible = true
+		
 	
