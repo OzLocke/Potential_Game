@@ -4,100 +4,210 @@
 [ext_resource type="Script" path="res://board.gd" id="1_vfpam"]
 
 [node name="Board" type="AspectRatioContainer"]
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
+anchors_preset = -1
+anchor_left = 0.139
+anchor_top = -0.079
+anchor_right = 0.861
+anchor_bottom = 1.076
+offset_left = 693.12
+offset_top = 625.32
+offset_right = -693.12
+offset_bottom = -622.08
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_vfpam")
 
 [node name="Hex" parent="." groups=["spaces"] instance=ExtResource("1_c2ema")]
 position = Vector2(-198, -342)
-q = 2
+q = 3
+r = 1
 
 [node name="Hex2" parent="." groups=["spaces"] instance=ExtResource("1_c2ema")]
 position = Vector2(0, -342)
-q = 3
+q = 4
+r = 1
 
 [node name="Hex3" parent="." groups=["spaces"] instance=ExtResource("1_c2ema")]
 position = Vector2(198, -342)
+q = 5
+r = 1
+
+[node name="Hex20" parent="." groups=["spaces"] instance=ExtResource("1_c2ema")]
+position = Vector2(-297, -511)
+q = 3
+outer = true
+
+[node name="Hex23" parent="." groups=["spaces"] instance=ExtResource("1_c2ema")]
+position = Vector2(-396, -342)
+q = 2
+r = 1
+outer = true
+
+[node name="Hex24" parent="." groups=["spaces"] instance=ExtResource("1_c2ema")]
+position = Vector2(-495, -172)
+q = 1
+r = 2
+outer = true
+
+[node name="Hex25" parent="." groups=["spaces"] instance=ExtResource("1_c2ema")]
+position = Vector2(-594, -2)
+r = 3
+outer = true
+
+[node name="Hex26" parent="." groups=["spaces"] instance=ExtResource("1_c2ema")]
+position = Vector2(-495, 168)
+r = 4
+outer = true
+
+[node name="Hex27" parent="." groups=["spaces"] instance=ExtResource("1_c2ema")]
+position = Vector2(-396, 338)
+r = 5
+outer = true
+
+[node name="Hex28" parent="." groups=["spaces"] instance=ExtResource("1_c2ema")]
+position = Vector2(-297, 508)
+r = 6
+outer = true
+
+[node name="Hex29" parent="." groups=["spaces"] instance=ExtResource("1_c2ema")]
+position = Vector2(-99, 508)
+q = 1
+r = 6
+outer = true
+
+[node name="Hex30" parent="." groups=["spaces"] instance=ExtResource("1_c2ema")]
+position = Vector2(99, 508)
+q = 2
+r = 6
+outer = true
+
+[node name="Hex31" parent="." groups=["spaces"] instance=ExtResource("1_c2ema")]
+position = Vector2(297, 508)
+q = 3
+r = 6
+outer = true
+
+[node name="Hex32" parent="." groups=["spaces"] instance=ExtResource("1_c2ema")]
+position = Vector2(396, 338)
 q = 4
+r = 5
+outer = true
+
+[node name="Hex33" parent="." groups=["spaces"] instance=ExtResource("1_c2ema")]
+position = Vector2(495, 168)
+q = 5
+r = 4
+outer = true
+
+[node name="Hex34" parent="." groups=["spaces"] instance=ExtResource("1_c2ema")]
+position = Vector2(594, 0)
+q = 6
+r = 3
+outer = true
+
+[node name="Hex35" parent="." groups=["spaces"] instance=ExtResource("1_c2ema")]
+position = Vector2(495, -172)
+q = 6
+r = 2
+outer = true
+
+[node name="Hex36" parent="." groups=["spaces"] instance=ExtResource("1_c2ema")]
+position = Vector2(396, -342)
+q = 6
+r = 1
+outer = true
+
+[node name="Hex37" parent="." groups=["spaces"] instance=ExtResource("1_c2ema")]
+position = Vector2(297, -511)
+q = 6
+outer = true
+
+[node name="Hex21" parent="." groups=["spaces"] instance=ExtResource("1_c2ema")]
+position = Vector2(-99, -511)
+q = 4
+outer = true
+
+[node name="Hex22" parent="." groups=["spaces"] instance=ExtResource("1_c2ema")]
+position = Vector2(99, -511)
+q = 5
+outer = true
 
 [node name="Hex4" parent="." groups=["spaces"] instance=ExtResource("1_c2ema")]
 position = Vector2(-297, -172)
-q = 1
-r = 1
+q = 2
+r = 2
 
 [node name="Hex5" parent="." groups=["spaces"] instance=ExtResource("1_c2ema")]
 position = Vector2(-99, -172)
-q = 2
-r = 1
+q = 3
+r = 2
 
 [node name="Hex6" parent="." groups=["spaces"] instance=ExtResource("1_c2ema")]
 position = Vector2(99, -172)
-q = 3
-r = 1
+q = 4
+r = 2
 
 [node name="Hex7" parent="." groups=["spaces"] instance=ExtResource("1_c2ema")]
 position = Vector2(297, -172)
-q = 4
-r = 1
+q = 5
+r = 2
 
 [node name="Hex8" parent="." groups=["spaces"] instance=ExtResource("1_c2ema")]
 position = Vector2(-396, -2)
-r = 2
+q = 1
+r = 3
 
 [node name="Hex9" parent="." groups=["spaces"] instance=ExtResource("1_c2ema")]
 position = Vector2(-198, -2)
-q = 1
-r = 2
+q = 2
+r = 3
 
 [node name="Hex10" parent="." groups=["spaces"] instance=ExtResource("1_c2ema")]
 position = Vector2(198, -2)
-q = 3
-r = 2
+q = 4
+r = 3
 
 [node name="Hex11" parent="." groups=["spaces"] instance=ExtResource("1_c2ema")]
 position = Vector2(396, -2)
-q = 4
-r = 2
+q = 5
+r = 3
 
 [node name="Hex12" parent="." groups=["spaces"] instance=ExtResource("1_c2ema")]
 position = Vector2(-297, 168)
-r = 3
+q = 1
+r = 4
 
 [node name="Hex13" parent="." groups=["spaces"] instance=ExtResource("1_c2ema")]
 position = Vector2(-99, 168)
-q = 1
-r = 3
+q = 2
+r = 4
 
 [node name="Hex14" parent="." groups=["spaces"] instance=ExtResource("1_c2ema")]
 position = Vector2(99, 168)
-q = 2
-r = 3
+q = 3
+r = 4
 
 [node name="Hex15" parent="." groups=["spaces"] instance=ExtResource("1_c2ema")]
 position = Vector2(297, 168)
-q = 3
-r = 3
+q = 4
+r = 4
 
 [node name="Hex16" parent="." groups=["spaces"] instance=ExtResource("1_c2ema")]
 position = Vector2(-198, 338)
-r = 4
+q = 1
+r = 5
 
 [node name="Hex17" parent="." groups=["spaces"] instance=ExtResource("1_c2ema")]
 position = Vector2(0, 338)
-q = 1
-r = 4
+q = 2
+r = 5
 
 [node name="Hex18" parent="." groups=["spaces"] instance=ExtResource("1_c2ema")]
 position = Vector2(198, 338)
-q = 2
-r = 4
+q = 3
+r = 5
 
 [node name="Hex19" parent="." groups=["spaces"] instance=ExtResource("1_c2ema")]
 position = Vector2(0, -2)
-q = 2
-r = 2
+q = 3
+r = 3

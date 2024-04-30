@@ -1,12 +1,15 @@
 extends Area2D
 @export var q: int = 0
 @export var r: int = 0
+@export var outer: bool = false
 var highlighted = false
 
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	pass
+	#Differentiate Bleeding Edge hexes
+	if self.outer:
+		$Sprite2D.modulate.a = 0.5
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.

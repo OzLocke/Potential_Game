@@ -181,14 +181,8 @@ func _on_move_complete():
 		self.destroy_piece.remove_from_group("pieces")
 		self.destroy_piece.queue_free()
 		self.destroy_piece = null
-	var game_over = true
-	for piece in get_tree().get_nodes_in_group("pieces"):
-		if piece.piece_owner != self.piece_owner:
-			game_over = false
-			break
-	if game_over:
-		self.game.game_over()
-	elif self.moves_remaining <= 0:
+	self.game.check_game(self.piece_owner)
+	if self.moves_remaining <= 0:
 		end_turn()
 	else:
 		available_moves()
@@ -208,4 +202,4 @@ func end_turn():
 	for piece in get_tree().get_nodes_in_group("pieces"):
 		piece.jumpable = true
 	#trigger a new turn
-	self.game.end_turn()
+	self.game.end_turn(self.piece_owner)

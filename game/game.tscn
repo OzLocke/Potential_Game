@@ -17,6 +17,7 @@ script = ExtResource("1_mmeew")
 
 [node name="Board" parent="." instance=ExtResource("1_y254d")]
 layout_mode = 1
+scale = Vector2(0.75, 0.75)
 mouse_filter = 2
 stretch_mode = 3
 

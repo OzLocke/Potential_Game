@@ -12,4 +12,5 @@ func _process(delta):
 
 
 func _on_button_button_up():
+	#Once I have dedicated scenes for start and end, this should be replaced with a more code-based retsart
 	get_tree().reload_current_scene()
